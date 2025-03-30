@@ -1,0 +1,21 @@
+
+This file holds the place for the texture files. In a real implementation, you would need to add the following texture files:
+
+- sun.jpg
+- mercury.jpg
+- venus.jpg
+- earth.jpg
+- mars.jpg
+- jupiter.jpg
+- saturn.jpg
+- uranus.jpg
+- neptune.jpg
+- moon.jpg
+- phobos.jpg
+- deimos.jpg
+- saturn_rings.png
+- jupiter_ring.png
+- uranus_rings.png
+- neptune_rings.png
+
+These would be actual NASA textures of the planets and moons.
