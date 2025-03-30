@@ -1,7 +1,6 @@
-
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { ALL_CELESTIAL_BODIES, AU, DISTANCE_SCALE, SIZE_SCALE, SUN_DATA } from '@/lib/constants';
 import InfoPanel from './InfoPanel';
 import Controls from './Controls';
@@ -227,8 +226,8 @@ const SolarSystem = () => {
     );
     const sunMaterial = new THREE.MeshStandardMaterial({
       map: textureLoader.load('/textures/sun.jpg'),
-      emissiveMap: textureLoader.load('/textures/sun.jpg'),
       emissive: new THREE.Color(0xffaa00),
+      emissiveMap: textureLoader.load('/textures/sun.jpg'),
       emissiveIntensity: 0.5,
     });
     
@@ -271,24 +270,52 @@ const SolarSystem = () => {
       
       // Add planet ring if it has one
       if (planet.hasRings && planet.ringTexture && planet.ringInnerRadius && planet.ringOuterRadius) {
+        // Enhanced ring creation with increased size and opacity
         const ringGeometry = new THREE.RingGeometry(
           planet.ringInnerRadius * SIZE_SCALE,
           planet.ringOuterRadius * SIZE_SCALE,
-          64
+          128 // Increase segments for smoother rings
         );
         
         const ringTexture = textureLoader.load(planet.ringTexture);
+        ringTexture.anisotropy = 16; // Improve texture quality
+        
+        // Apply better ring material with higher opacity
         const ringMaterial = new THREE.MeshBasicMaterial({
           map: ringTexture,
           side: THREE.DoubleSide,
           transparent: true,
-          opacity: 0.8
+          opacity: 0.9, // Increased opacity for better visibility
+          depthWrite: false, // Helps with transparent rendering
         });
         
         const ring = new THREE.Mesh(ringGeometry, ringMaterial);
         ring.rotation.x = Math.PI / 2;
         ring.rotation.y = planet.axialTilt * Math.PI / 180;
+        
+        // Add subtle glow effect
+        const ringGlowGeometry = new THREE.RingGeometry(
+          planet.ringInnerRadius * SIZE_SCALE * 0.98,
+          planet.ringOuterRadius * SIZE_SCALE * 1.02,
+          64
+        );
+        
+        const ringGlowMaterial = new THREE.MeshBasicMaterial({
+          color: 0xffffff,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.15,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        });
+        
+        const ringGlow = new THREE.Mesh(ringGlowGeometry, ringGlowMaterial);
+        ringGlow.rotation.x = Math.PI / 2;
+        ringGlow.rotation.y = planet.axialTilt * Math.PI / 180;
+        
+        // Add both ring and glow to planet group
         planetGroup.add(ring);
+        planetGroup.add(ringGlow);
       }
       
       // Add atmosphere if the planet has one
