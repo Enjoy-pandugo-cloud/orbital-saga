@@ -3,13 +3,13 @@ import { useState } from 'react';
 import { CelestialBodyData } from '@/lib/constants';
 import { Button } from '@/components/ui/button';
 import { 
-  PlanetIcon, 
-  SunIcon, 
-  CircleDashedIcon, 
-  TimerIcon, 
-  TagIcon, 
-  ChevronDownIcon,
-  ChevronUpIcon,
+  Planet, 
+  Sun, 
+  CircleDashed, 
+  Timer, 
+  Tag, 
+  ChevronDown,
+  ChevronUp,
   Info
 } from 'lucide-react';
 
@@ -58,7 +58,7 @@ const Controls: React.FC<ControlsProps> = ({
               {/* Celestial bodies */}
               <div className="bg-secondary/30 p-3 rounded-md">
                 <h3 className="text-sm font-medium mb-2 text-primary flex items-center">
-                  <PlanetIcon className="w-4 h-4 mr-1" /> Celestial Bodies
+                  <Planet className="w-4 h-4 mr-1" /> Celestial Bodies
                 </h3>
                 <div className="grid grid-cols-3 gap-2">
                   {bodies.map(body => (
@@ -69,7 +69,7 @@ const Controls: React.FC<ControlsProps> = ({
                       className={`text-xs ${selectedBody.id === body.id ? "bg-primary" : "bg-secondary/50"}`}
                       onClick={() => onBodySelect(body.id)}
                     >
-                      {body.id === 'sun' ? <SunIcon className="w-3 h-3 mr-1" /> : <PlanetIcon className="w-3 h-3 mr-1" />}
+                      {body.id === 'sun' ? <Sun className="w-3 h-3 mr-1" /> : <Planet className="w-3 h-3 mr-1" />}
                       {body.name}
                     </Button>
                   ))}
@@ -79,7 +79,7 @@ const Controls: React.FC<ControlsProps> = ({
               {/* Speed controls */}
               <div className="bg-secondary/30 p-3 rounded-md">
                 <h3 className="text-sm font-medium mb-2 text-primary flex items-center">
-                  <TimerIcon className="w-4 h-4 mr-1" /> Simulation Speed
+                  <Timer className="w-4 h-4 mr-1" /> Simulation Speed
                 </h3>
                 <div className="grid grid-cols-3 gap-2">
                   {speedOptions.map(option => (
@@ -108,7 +108,7 @@ const Controls: React.FC<ControlsProps> = ({
                     className={`text-xs w-full justify-start ${showOrbits ? "bg-primary" : "bg-secondary/50"}`}
                     onClick={() => setShowOrbits(!showOrbits)}
                   >
-                    <CircleDashedIcon className="w-3 h-3 mr-1" />
+                    <CircleDashed className="w-3 h-3 mr-1" />
                     Show Orbit Paths
                   </Button>
                   
@@ -118,7 +118,7 @@ const Controls: React.FC<ControlsProps> = ({
                     className={`text-xs w-full justify-start ${showLabels ? "bg-primary" : "bg-secondary/50"}`}
                     onClick={() => setShowLabels(!showLabels)}
                   >
-                    <TagIcon className="w-3 h-3 mr-1" />
+                    <Tag className="w-3 h-3 mr-1" />
                     Show Labels
                   </Button>
                   
@@ -156,12 +156,12 @@ const Controls: React.FC<ControlsProps> = ({
               <Button variant="outline" size="sm" className="bg-secondary/50" onClick={() => setIsExpanded(!isExpanded)}>
                 {isExpanded ? (
                   <>
-                    <ChevronDownIcon className="w-4 h-4 mr-1" />
+                    <ChevronDown className="w-4 h-4 mr-1" />
                     Hide Controls
                   </>
                 ) : (
                   <>
-                    <ChevronUpIcon className="w-4 h-4 mr-1" />
+                    <ChevronUp className="w-4 h-4 mr-1" />
                     Show Controls
                   </>
                 )}

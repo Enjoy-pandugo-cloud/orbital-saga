@@ -1,8 +1,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { ALL_CELESTIAL_BODIES, AU, DISTANCE_SCALE, SIZE_SCALE } from '@/lib/constants';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { ALL_CELESTIAL_BODIES, AU, DISTANCE_SCALE, SIZE_SCALE, SUN_DATA } from '@/lib/constants';
 import InfoPanel from './InfoPanel';
 import Controls from './Controls';
 
@@ -225,8 +225,9 @@ const SolarSystem = () => {
       64, 
       64
     );
-    const sunMaterial = new THREE.MeshBasicMaterial({
+    const sunMaterial = new THREE.MeshStandardMaterial({
       map: textureLoader.load('/textures/sun.jpg'),
+      emissiveMap: textureLoader.load('/textures/sun.jpg'),
       emissive: new THREE.Color(0xffaa00),
       emissiveIntensity: 0.5,
     });
