@@ -1,4 +1,3 @@
-
 // Solar System Data based on NASA specifications
 // All distances in kilometers, converted to AU (Astronomical Units) where needed
 // Time periods in Earth days
@@ -38,8 +37,8 @@ export interface Moon {
 }
 
 // Scale factor for visualization (reduces the real distances to make visualization possible)
-export const DISTANCE_SCALE = 1/50; // Scale down distances
-export const SIZE_SCALE = 1/1000; // Scale up sizes for visibility
+export const DISTANCE_SCALE = 1/10; // Increased scale for better visibility (was 1/50)
+export const SIZE_SCALE = 1/500; // Increased scale for better visibility (was 1/1000)
 
 export const SUN_DATA: CelestialBodyData = {
   id: "sun",

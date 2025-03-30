@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { ALL_CELESTIAL_BODIES, AU, DISTANCE_SCALE, SIZE_SCALE, SUN_DATA } from '@/lib/constants';
 import InfoPanel from './InfoPanel';
 import Controls from './Controls';
@@ -39,7 +39,7 @@ const SolarSystem = () => {
       0.1, 
       1000000
     );
-    camera.position.set(0, 20, 50);
+    camera.position.set(0, 80, 200); // Adjusted camera position for better initial view
     cameraRef.current = camera;
     
     // Setup renderer
@@ -55,8 +55,13 @@ const SolarSystem = () => {
     rendererRef.current = renderer;
     
     // Add ambient light
-    const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+    const ambientLight = new THREE.AmbientLight(0x404040, 1.0); // Increased ambient light
     scene.add(ambientLight);
+    
+    // Add directional light for better shadows
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    directionalLight.position.set(1, 1, 1);
+    scene.add(directionalLight);
     
     // Add controls
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -64,7 +69,7 @@ const SolarSystem = () => {
     controls.dampingFactor = 0.1;
     controls.rotateSpeed = 0.5;
     controls.minDistance = 5;
-    controls.maxDistance = 500;
+    controls.maxDistance = 1000; // Increased max distance
     controlsRef.current = controls;
     
     // Create celestial bodies
@@ -105,6 +110,9 @@ const SolarSystem = () => {
     };
     
     animate();
+    
+    // Initial position update to ensure all planets are visible
+    updateCelestialPositions(timeSpeed);
     
     // Cleanup
     return () => {
@@ -163,10 +171,10 @@ const SolarSystem = () => {
       // Set target position for orbit controls
       controlsRef.current.target.copy(targetPosition);
       
-      // Position camera to show the body
+      // Position camera to show the body with better visibility
       const distance = selectedBody.id === 'sun' 
         ? selectedBody.radius * SIZE_SCALE * 15
-        : selectedBody.radius * SIZE_SCALE * 20;
+        : selectedBody.radius * SIZE_SCALE * 30; // Increased viewing distance
       
       const cameraOffset = new THREE.Vector3(distance, distance/2, distance);
       cameraRef.current.position.copy(targetPosition).add(cameraOffset);
@@ -227,7 +235,7 @@ const SolarSystem = () => {
       map: textureLoader.load('/textures/sun.jpg'),
       emissive: new THREE.Color(0xffaa00),
       emissiveMap: textureLoader.load('/textures/sun.jpg'),
-      emissiveIntensity: 0.5,
+      emissiveIntensity: 1.0, // Increased intensity
     });
     
     const sun = new THREE.Mesh(sunGeometry, sunMaterial);
@@ -280,12 +288,12 @@ const SolarSystem = () => {
     corona.name = 'sun_corona';
     scene.add(corona);
     
-    // Add sun light
-    const sunLight = new THREE.PointLight(0xffffff, 2, 0, 1);
+    // Add sun light with increased intensity and distance
+    const sunLight = new THREE.PointLight(0xffffff, 3, 1000, 1);
     sunLight.position.set(0, 0, 0);
     scene.add(sunLight);
     
-    // Create planets
+    // Create planets with increased visibility
     ALL_CELESTIAL_BODIES.slice(1).forEach(planet => {
       // Planet group to handle rotation and position
       const planetGroup = new THREE.Group();
@@ -293,17 +301,17 @@ const SolarSystem = () => {
       scene.add(planetGroup);
       celestialBodiesRef.current.set(planet.id, planetGroup);
       
-      // Create planet mesh
+      // Create planet mesh with enhanced size for visibility
       const planetGeometry = new THREE.SphereGeometry(
-        planet.radius * SIZE_SCALE,
+        planet.radius * SIZE_SCALE * 2, // Double the size for better visibility
         32,
         32
       );
       
       const planetMaterial = new THREE.MeshStandardMaterial({
         map: textureLoader.load(`/textures/${planet.id}.jpg`),
-        roughness: 1,
-        metalness: 0
+        roughness: 0.8,
+        metalness: 0.1
       });
       
       const planetMesh = new THREE.Mesh(planetGeometry, planetMaterial);
@@ -316,8 +324,8 @@ const SolarSystem = () => {
       if (planet.hasRings && planet.ringTexture && planet.ringInnerRadius && planet.ringOuterRadius) {
         // Enhanced ring creation with increased size and opacity
         const ringGeometry = new THREE.RingGeometry(
-          planet.ringInnerRadius * SIZE_SCALE,
-          planet.ringOuterRadius * SIZE_SCALE,
+          planet.ringInnerRadius * SIZE_SCALE * 2, // Double size
+          planet.ringOuterRadius * SIZE_SCALE * 2, // Double size
           128 // Increase segments for smoother rings
         );
         
@@ -339,8 +347,8 @@ const SolarSystem = () => {
         
         // Add subtle glow effect
         const ringGlowGeometry = new THREE.RingGeometry(
-          planet.ringInnerRadius * SIZE_SCALE * 0.98,
-          planet.ringOuterRadius * SIZE_SCALE * 1.02,
+          planet.ringInnerRadius * SIZE_SCALE * 1.96, // Double size
+          planet.ringOuterRadius * SIZE_SCALE * 2.04, // Double size
           64
         );
         
@@ -364,12 +372,12 @@ const SolarSystem = () => {
       
       // Add atmosphere if the planet has one
       if (planet.hasAtmosphere && planet.atmosphereColor) {
-        const atmRadius = planet.radius * SIZE_SCALE * 1.05;
+        const atmRadius = planet.radius * SIZE_SCALE * 2.1; // Double size
         const atmosphereGeometry = new THREE.SphereGeometry(atmRadius, 32, 32);
         const atmosphereMaterial = new THREE.MeshBasicMaterial({
           color: new THREE.Color(planet.atmosphereColor),
           transparent: true,
-          opacity: 0.2,
+          opacity: 0.3, // Increased opacity
           side: THREE.BackSide
         });
         
@@ -377,7 +385,7 @@ const SolarSystem = () => {
         planetGroup.add(atmosphere);
       }
       
-      // Add planet label if showLabels is true
+      // Add planet label with increased size
       if (showLabels) {
         // Create canvas for label
         const canvas = document.createElement('canvas');
@@ -405,8 +413,8 @@ const SolarSystem = () => {
           });
           
           const labelSprite = new THREE.Sprite(labelMaterial);
-          labelSprite.position.set(0, planet.radius * SIZE_SCALE * 2, 0);
-          labelSprite.scale.set(6, 3, 1);
+          labelSprite.position.set(0, planet.radius * SIZE_SCALE * 4, 0); // Position label higher
+          labelSprite.scale.set(8, 4, 1); // Larger label
           labelSprite.name = `label_${planet.id}`;
           
           planetGroup.add(labelSprite);
@@ -421,7 +429,7 @@ const SolarSystem = () => {
           planetGroup.add(moonGroup);
           
           const moonGeometry = new THREE.SphereGeometry(
-            moon.radius * SIZE_SCALE * 5, // Scale up for visibility
+            moon.radius * SIZE_SCALE * 10, // Significantly scale up for visibility
             16,
             16
           );
@@ -443,7 +451,7 @@ const SolarSystem = () => {
   
   const createOrbitPaths = (scene: THREE.Scene) => {
     ALL_CELESTIAL_BODIES.slice(1).forEach(planet => {
-      // Elliptical orbit path
+      // Elliptical orbit path with increased visibility
       const segments = 128;
       const distance = planet.distanceFromSun * AU * DISTANCE_SCALE;
       
@@ -457,10 +465,10 @@ const SolarSystem = () => {
       
       const orbitGeometry = new THREE.BufferGeometry().setFromPoints(orbitPoints);
       const orbitMaterial = new THREE.LineBasicMaterial({
-        color: 0x4d7faa,
+        color: 0x6ba5e7, // Brighter blue
         transparent: true,
-        opacity: 0.5,
-        linewidth: 1,
+        opacity: 0.8, // Increased opacity
+        linewidth: 2, // Note: linewidth is limited in WebGL
       });
       
       const orbitPath = new THREE.Line(orbitGeometry, orbitMaterial);
@@ -506,12 +514,12 @@ const SolarSystem = () => {
       
       // Update moons if the planet has any
       if (planet.moons) {
-        planet.moons.forEach((moon, index) => {
-          if (planetObj.children.length > index + 1) {
-            const moonGroup = planetObj.children[index + 1] as THREE.Group;
-            
-            // Calculate moon orbital position
-            const moonDistance = moon.distanceFromPlanet * DISTANCE_SCALE * 0.0001;
+        planet.moons.forEach((moon) => {
+          // Find moon group by name instead of using index
+          const moonGroup = planetObj.children.find(child => child.name === moon.id) as THREE.Group | undefined;
+          if (moonGroup) {
+            // Calculate moon orbital position with increased distance for visibility
+            const moonDistance = moon.distanceFromPlanet * DISTANCE_SCALE * 0.001; // Increased visibility
             const moonOrbitalSpeed = 2 * Math.PI / moon.orbitalPeriod;
             
             const moonX = Math.cos(time * moonOrbitalSpeed * 10) * moonDistance;
