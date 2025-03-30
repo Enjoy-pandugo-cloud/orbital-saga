@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { CelestialBodyData } from '@/lib/constants';
 import { Button } from '@/components/ui/button';
 import { 
-  Planet, 
+  Globe, 
   Sun, 
   CircleDashed, 
   Timer, 
@@ -58,7 +58,7 @@ const Controls: React.FC<ControlsProps> = ({
               {/* Celestial bodies */}
               <div className="bg-secondary/30 p-3 rounded-md">
                 <h3 className="text-sm font-medium mb-2 text-primary flex items-center">
-                  <Planet className="w-4 h-4 mr-1" /> Celestial Bodies
+                  <Globe className="w-4 h-4 mr-1" /> Celestial Bodies
                 </h3>
                 <div className="grid grid-cols-3 gap-2">
                   {bodies.map(body => (
@@ -69,7 +69,7 @@ const Controls: React.FC<ControlsProps> = ({
                       className={`text-xs ${selectedBody.id === body.id ? "bg-primary" : "bg-secondary/50"}`}
                       onClick={() => onBodySelect(body.id)}
                     >
-                      {body.id === 'sun' ? <Sun className="w-3 h-3 mr-1" /> : <Planet className="w-3 h-3 mr-1" />}
+                      {body.id === 'sun' ? <Sun className="w-3 h-3 mr-1" /> : <Globe className="w-3 h-3 mr-1" />}
                       {body.name}
                     </Button>
                   ))}
