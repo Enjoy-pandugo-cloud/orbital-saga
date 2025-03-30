@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { ALL_CELESTIAL_BODIES, AU, DISTANCE_SCALE, SIZE_SCALE, SUN_DATA } from '@/lib/constants';
 import InfoPanel from './InfoPanel';
 import Controls from './Controls';
@@ -121,7 +121,6 @@ const SolarSystem = () => {
     };
   }, []);
   
-  // Update orbit paths when showOrbits changes
   useEffect(() => {
     if (!sceneRef.current) return;
     
@@ -140,7 +139,6 @@ const SolarSystem = () => {
     }
   }, [showOrbits]);
   
-  // Update labels when showLabels changes
   useEffect(() => {
     if (!sceneRef.current) return;
     
@@ -153,7 +151,6 @@ const SolarSystem = () => {
     });
   }, [showLabels]);
   
-  // Focus on selected body
   useEffect(() => {
     if (!cameraRef.current || !controlsRef.current) return;
     
@@ -224,6 +221,8 @@ const SolarSystem = () => {
       64, 
       64
     );
+    
+    // Enhanced sun material with corona effect
     const sunMaterial = new THREE.MeshStandardMaterial({
       map: textureLoader.load('/textures/sun.jpg'),
       emissive: new THREE.Color(0xffaa00),
@@ -235,6 +234,51 @@ const SolarSystem = () => {
     sun.name = 'sun';
     scene.add(sun);
     celestialBodiesRef.current.set('sun', sun);
+    
+    // Add sun corona
+    const coronaGeometry = new THREE.SphereGeometry(
+      SUN_DATA.radius * SIZE_SCALE * 1.2, 
+      32, 
+      32
+    );
+    const coronaMaterial = new THREE.ShaderMaterial({
+      uniforms: {
+        sunTexture: { value: textureLoader.load('/textures/sun.jpg') },
+        time: { value: 0.0 },
+        color: { value: new THREE.Color(0xffddaa) }
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        varying vec3 vNormal;
+        
+        void main() {
+          vUv = uv;
+          vNormal = normalize(normalMatrix * normal);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform sampler2D sunTexture;
+        uniform float time;
+        uniform vec3 color;
+        
+        varying vec2 vUv;
+        varying vec3 vNormal;
+        
+        void main() {
+          float intensity = pow(0.7 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 4.0);
+          gl_FragColor = vec4(color, intensity * 0.4);
+        }
+      `,
+      transparent: true,
+      side: THREE.BackSide,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    
+    const corona = new THREE.Mesh(coronaGeometry, coronaMaterial);
+    corona.name = 'sun_corona';
+    scene.add(corona);
     
     // Add sun light
     const sunLight = new THREE.PointLight(0xffffff, 2, 0, 1);
@@ -427,6 +471,13 @@ const SolarSystem = () => {
   
   const updateCelestialPositions = (speed: number) => {
     const time = Date.now() * 0.0001 * speed;
+    
+    // Update sun corona
+    const corona = sceneRef.current?.getObjectByName('sun_corona');
+    if (corona && corona.material instanceof THREE.ShaderMaterial) {
+      corona.material.uniforms.time.value = time;
+      corona.rotation.y += 0.0005 * speed;
+    }
     
     ALL_CELESTIAL_BODIES.slice(1).forEach(planet => {
       const planetObj = celestialBodiesRef.current.get(planet.id);
