@@ -473,8 +473,8 @@ const SolarSystem = () => {
     const time = Date.now() * 0.0001 * speed;
     
     // Update sun corona
-    const corona = sceneRef.current?.getObjectByName('sun_corona');
-    if (corona && corona.material instanceof THREE.ShaderMaterial) {
+    const corona = sceneRef.current?.getObjectByName('sun_corona') as THREE.Mesh<THREE.SphereGeometry, THREE.ShaderMaterial> | undefined;
+    if (corona && corona.material) {
       corona.material.uniforms.time.value = time;
       corona.rotation.y += 0.0005 * speed;
     }
