@@ -10,7 +10,9 @@ import {
   Tag, 
   ChevronDown,
   ChevronUp,
-  Info
+  Info,
+  ZoomIn,
+  Eye
 } from 'lucide-react';
 
 interface ControlsProps {
@@ -36,7 +38,7 @@ const Controls: React.FC<ControlsProps> = ({
   timeSpeed,
   setTimeSpeed
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true); // Default to expanded
   const [showHelp, setShowHelp] = useState(false);
   
   const speedOptions = [
@@ -51,6 +53,45 @@ const Controls: React.FC<ControlsProps> = ({
   return (
     <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 solar-system-ui">
       <div className="flex flex-col items-center">
+        {/* Quick view button */}
+        <div className="bg-card/90 backdrop-blur-sm rounded-lg border border-border shadow-lg p-3 mb-3 w-fit">
+          <div className="flex space-x-2 mb-3">
+            <Button variant="default" size="sm" onClick={() => onBodySelect('sun')} className="bg-yellow-500 hover:bg-yellow-600">
+              <Sun className="w-4 h-4 mr-1" /> View Sun
+            </Button>
+            {bodies.slice(1, 5).map(body => (
+              <Button
+                key={body.id}
+                variant="secondary"
+                size="sm"
+                onClick={() => onBodySelect(body.id)}
+                className="text-xs"
+              >
+                <Globe className="w-3 h-3 mr-1" />
+                {body.name}
+              </Button>
+            ))}
+          </div>
+          
+          <div className="flex justify-between">
+            <div className="text-xs">
+              <span className="text-muted-foreground mr-2">Try these planet views!</span>
+              <span className="text-primary font-medium">Currently viewing: {selectedBody.name}</span>
+            </div>
+            <div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="bg-primary/20 text-xs"
+                onClick={() => setTimeSpeed(0.1)}
+              >
+                <Eye className="w-3 h-3 mr-1" />
+                Slow Motion
+              </Button>
+            </div>
+          </div>
+        </div>
+        
         {/* Main controls panel */}
         <div className="bg-card/90 backdrop-blur-sm rounded-lg border border-border shadow-lg p-3 w-fit">
           {isExpanded && (
@@ -146,6 +187,7 @@ const Controls: React.FC<ControlsProps> = ({
                 <li>• <strong>Mouse Wheel</strong>: Zoom in/out</li>
                 <li>• <strong>Select planet</strong>: Focus camera on planet</li>
                 <li>• <strong>Speed controls</strong>: Change simulation speed</li>
+                <li>• <strong>Quick Tips</strong>: Use slow motion (0.1x) to observe planets better</li>
               </ul>
             </div>
           )}
